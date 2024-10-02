@@ -1,5 +1,7 @@
 # Is Every Feature Beneficial From Graph Convolution?
 
+* keeping updating
+
 ![Framework image](assets/framework.png)
 
 This repository contains the official authors implementation associated with the paper "[Is Every Feature Beneficial From Graph Convolution?]()".
