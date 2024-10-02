@@ -1,0 +1,14 @@
+name: gsl
+channels:
+  - pytorch
+  - dglteam
+dependencies:
+  - tqdm
+  - pyyaml
+  - numpy
+  - pandas
+  - scikit-learn
+  - cudatoolkit=12.1
+  - pytorch
+  - dgl-cuda12.1
+  - huggingface_hub
