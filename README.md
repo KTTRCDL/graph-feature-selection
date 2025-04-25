@@ -33,7 +33,7 @@ To run the Graph Feature Selection (GFS), simple use
 python train.py --name example --dataset Children --model GCN-MLP
 ```
 
-<details>
+// <details>
 <summary><span style="font-weight: bold;">Command Line Arguments for train.py  (click to expand)</span></summary>
 
 *  Experiment Setup
@@ -74,7 +74,7 @@ python train.py --name example --dataset Children --model GCN-MLP
     - `--amp`: (default: `False`) - Enable automatic mixed precision (AMP) for training.
     - `--verbose`: (default: `False`) - Enable verbose logging.
 
-</details>
+// </details>
 
 The settings and result will be save at args.yaml and metrics.yaml in folder [experiments](experiments)
 
