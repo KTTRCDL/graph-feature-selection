@@ -1,7 +1,5 @@
 # Let Your Features Tell The Differences: Understanding Graph Convolution By Feature Splitting
 
-* keeping updating
-
 ![Framework image](assets/framework.png)
 
 This repository contains the official authors implementation associated with the paper "[Let Your Features Tell The Differences: Understanding Graph Convolution By Feature Splitting](https://openreview.net/forum?id=I9omfcWfMp)".
