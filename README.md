@@ -34,7 +34,7 @@ python train.py --name example --dataset Children --model GCN-MLP
 ```
 
 <!-- <details>  -->
-<summary><span style="font-weight: bold;">Command Line Arguments for train.py  (click to expand)</span></summary>
+<summary><span style="font-weight: bold;">Command Line Arguments for train.py  <!-- (click to expand)  --></span></summary>
 
 *  Experiment Setup
     - `--name`: (type: str, default: `None`) - Experiment name. If None, model name is used.
