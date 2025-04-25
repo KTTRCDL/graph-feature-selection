@@ -1,12 +1,12 @@
-# Is Every Feature Beneficial From Graph Convolution?
+# Let Your Features Tell The Differences: Understanding Graph Convolution By Feature Splitting
 
 * keeping updating
 
 ![Framework image](assets/framework.png)
 
-This repository contains the official authors implementation associated with the paper "[Is Every Feature Beneficial From Graph Convolution?]()".
+This repository contains the official authors implementation associated with the paper "[Let Your Features Tell The Differences: Understanding Graph Convolution By Feature Splitting](https://openreview.net/forum?id=I9omfcWfMp)".
 
-Abstract: Graph Neural Networks (GNNs) have demonstrated strong capabilities in processing structured data. While traditional GNNs typically treat each feature dimension equally during graph convolution, we raise an important question: *Is the graph convolution operation equally beneficial for each feature dimension?* If not, the convolution operation on certain feature dimensions can possibly lead to harmful effects, even worse than the convolution-free models. In prior studies, to assess the impacts of graph convolution on features, people proposed metrics based on feature homophily to measure feature consistency with the graph topology. However, these metrics have shown unsatisfactory alignment with GNN performance and have not been effectively employed to guide feature selection in GNNs. To address these limitations, we introduce a novel metric, Topological Feature Informativeness (TFI), to distinguish between GNN-favored and GNN-disfavored features, where its effectiveness is validated through both theoretical analysis and empirical observations. Based on TFI, we propose a simple yet effective Graph Feature Selection (GFS) method, which processes GNN-favored and GNN-disfavored features separately, using GNNs and non-GNN models. This approach maximizes the extraction of useful topological information from each feature. Extensive experiments show that after applying GFS to $8$ baseline and state-of-the-art (SOTA) GNN architectures across $10$ datasets, $83.75$\% of the GFS-augmented cases show significant performance boosts with only a little extra computational cost. This verifies the efficiency of our proposed  GFS method. Additionally, we demonstrate that GFS’s improvements are robust to hyperparameter tuning, highlighting its potential as a universal method for enhancing various GNN architectures.
+Abstract: Graph Neural Networks (GNNs) have demonstrated strong capabilities in processing structured data. While traditional GNNs typically treat each feature dimension equally important during graph convolution, we raise an important question: **Is the graph convolution operation equally beneficial for each feature?** If not, the convolution operation on certain feature dimensions can possibly lead to harmful effects, even worse than convolution-free models. Therefore, it is required to distinguish convolution-favored and convolution-disfavored features. Traditional feature selection methods mainly focus on identifying informative features or reducing redundancy, but they are not suitable for structured data as they overlook graph structures. In graph community, some studies have investigated the performance of GNN with respect to node features using feature homophily metrics, which assess feature consistency across graph topology. Unfortunately, these metrics do not effectively align with GNN performance and cannot be reliably used for feature selection in GNNs. To address these limitations, we introduce a novel metric, Topological Feature Informativeness (TFI), to distinguish GNN-favored and GNN-disfavored features, where its effectiveness is validated through both theoretical analysis and empirical observations. Based on TFI, we propose a simple yet effective Graph Feature Selection (GFS) method, which processes GNN-favored and GNN-disfavored features with GNNs and non-GNN models separately. Compared to original GNNs, GFS significantly improves the extraction of useful topological information from each feature with comparable computational costs. Extensive experiments show that after applying GFS to $\textbf{8}$ baseline and state-of-the-art (SOTA) GNN architectures across $\textbf{10}$ datasets, $\textbf{90\%}$ of the GFS-augmented cases show significant performance boosts. Furthermore, our proposed TFI metric outperforms other feature selection methods for GFS. These results verify the effectiveness of both GFS and TFI. Additionally, we demonstrate that GFS's improvements are robust to hyperparameter tuning, highlighting its potential as a universally valid method for enhancing various GNN architectures.
 
 ## Pre-requisites
 
@@ -17,9 +17,9 @@ Abstract: Graph Neural Networks (GNNs) have demonstrated strong capabilities in 
 1. Clone this repository
     ```shell
     # SSH
-    git clone git@
+    git clone ggit@github.com:KTTRCDL/graph-feature-selection.git
     # HTTPS
-    git clone https://
+    git clone https://github.com/KTTRCDL/graph-feature-selection.git
     ```
 2. Install python requirements. 
 
