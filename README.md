@@ -15,7 +15,7 @@ Abstract: Graph Neural Networks (GNNs) have demonstrated strong capabilities in 
 1. Clone this repository
     ```shell
     # SSH
-    git clone ggit@github.com:KTTRCDL/graph-feature-selection.git
+    git clone git@github.com:KTTRCDL/graph-feature-selection.git
     # HTTPS
     git clone https://github.com/KTTRCDL/graph-feature-selection.git
     ```
@@ -83,4 +83,21 @@ The settings and result will be save at args.yaml and metrics.yaml in folder [ex
 For more example, please check [script/run_example.sh](script/run_example.sh) and run:
 ```shell
 bash script/run_example.sh
+```
+
+## Acknowledgement
+
+This repository is based on the [dgl](https://github.com/dmlc/dgl) package and references the [heterophilous-graphs](https://github.com/yandex-research/heterophilous-graphs) project. We would thank the authors of these works for publicly releasing their code, which greatly facilitates our research.
+
+## Citation
+
+If you find this work useful, please consider citing our paper:
+
+```bibtex
+@inproceedings{zheng2025let,
+  title={Let your features tell the differences: Understanding graph convolution by feature splitting},
+  author={Zheng, Yilun and Li, Xiang and Luan, Sitao and Peng, Xiaojiang and Chen, Lihui},
+  booktitle={The Thirteenth International Conference on Learning Representations},
+  year={2025}
+}
 ```
