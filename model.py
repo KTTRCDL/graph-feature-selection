@@ -20,6 +20,7 @@ NORMALIZATION = {
     'BatchNorm': nn.BatchNorm1d
 }
 
+# Fundamental Model class
 class Model(nn.Module):
     def __init__(self, model_name, num_layers, num_layers_1, input_dim, input_dim_1, hidden_dim, hidden_dim_1, output_dim, 
                     hidden_dim_multiplier, num_heads, normalization, dropout):

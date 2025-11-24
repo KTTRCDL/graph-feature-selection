@@ -43,7 +43,7 @@ python train.py --name example --dataset Children --model GCN-MLP
 
 * Feature Selection
     - `--feature_norm_fn`: (type: str, default: `'z-norm'`) - Feature normalization function. Choices: `'None'`, `'z-norm'`, `'torch-norm'`.
-    - `--node_selection_fn_name`: (type: str, default: `'mi_agg'`) - Feature selection function name. Choices: `'None'`, `'mi_agg'`.
+    - `--node_selection_fn_name`: (type: str, default: `'mi_agg'`) - Feature selection function name. Choices: `'None'`, `'mi_agg'`, `'h_GE'`, `'h_attr'`, `'h_sim-cos'`, `'h_sim-euc'`, `'h_CTF'`.
     - `--ratio`: (type: float, default: `0.5`) - Split ratio for feature selection. If `ratio=1.0`, the GNN model is used directly.
     - `--node_selection_with_train_idx`: (default: `True`) - Use `train_idx` of split to select node features.
 

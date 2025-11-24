@@ -5,6 +5,8 @@ import torch
 import dgl
 from dgl import ops
 import sklearn.feature_selection as skfs
+from tqdm import tqdm
+from sklearn.metrics.pairwise import cosine_similarity
 
 class Logger:
     def __init__(self, args, metric, num_data_splits):
@@ -154,3 +156,121 @@ def mi_agg(graph, features, ori_labels, train_idx=None):
     mi_nei_lst = skfs.mutual_info_classif(feat_agg, ori_labels)
     hom_res = torch.tensor(mi_nei_lst)
     return hom_res
+
+def generalized_edge_homophily(graph, features, ori_labels, train_idx=None):
+    graph = dgl.remove_self_loop(graph)
+    graph = dgl.add_self_loop(graph)
+
+    nedges = graph.num_edges()
+    device = features.device
+    adj = graph.adjacency_matrix().to_dense()
+    adj = adj - torch.diag(torch.diag(adj))
+    adj = (adj > 0).float()
+    g_edge_homo = torch.zeros(features.shape[1]).to(device)
+    print(f"calculate generalized_edge_homophily...")
+    # calculate similarity and g_edge_homo for each dimension of feature
+    for i in tqdm(range(features.shape[1])):
+        # calculate the similarity metrix for i th dimension of feature 
+        sim = torch.tensor(cosine_similarity(features[:, i].cpu().unsqueeze(1))).to(device)
+        sim[torch.isnan(sim)] = 0
+        g_edge_homo[i] = torch.sum(sim * adj) / torch.sum(adj)
+
+    return g_edge_homo
+
+def attribute_homophily(graph, features, ori_labels, train_idx=None):
+    assert(torch.logical_not(ori_labels.unique()>=0).sum()==0) # All the labels must start from 0
+    assert(len(ori_labels.unique())==ori_labels.max()+1)
+    graph = dgl.remove_self_loop(graph)
+    graph = dgl.add_self_loop(graph)
+
+    num_node, num_feat = features.shape[0], features.shape[1]
+    src_node, _ = graph.edges()
+    out = ops.u_mul_v(graph, features, features)
+    out = out.transpose(1,0)
+    device = features.device
+    feat_agg = torch.zeros(num_feat, num_node).to(device)
+    feat_agg = feat_agg.scatter_add_(1,src_node.repeat(num_feat,1).long(),out)
+    feat_agg = feat_agg.transpose(1,0)
+    degs = torch.bincount(src_node).float()
+    # replaced by dgl.add_self_loop(graph)
+    # degs[degs==0] = 1 # To prevent zero divide
+    feat_agg = feat_agg/degs.unsqueeze(1).repeat(1,num_feat)
+    feat_sum = features.sum(dim=0)
+    feat_sum[feat_sum==0]=1
+    feat_agg = feat_agg.sum(dim=0)
+    hom = feat_agg/feat_sum
+    return hom
+
+def localsim_cos_homophily(graph, features, ori_labels, train_idx=None):
+    graph = dgl.remove_self_loop(graph)
+    device = features.device
+    src_node, _ = graph.edges()
+    num_node, num_feat = features.shape[0], features.shape[1]
+    sim_nodes = torch.zeros(num_feat).to(device)
+
+    out = ops.u_mul_v(graph, features, features)
+    out_norm = ops.u_mul_v(graph, features.norm(dim=1), features.norm(dim=1)).unsqueeze(1)
+    sim = out/out_norm
+    sim[sim.isnan()] = 0
+    print(f"calculate localsim_cos_homophily...")
+    for i in tqdm(range(num_feat)):
+        # degs = torch.bincount(src_node).float()
+        degs = graph.in_degrees().float()
+        degs[degs==0] = 1 # To prevent zero divide
+        sim_node = torch.zeros(num_node).to(device)
+        sim_node = sim_node.scatter_add_(0,src_node.long(), sim[:, i].squeeze(0))
+        sim_node = sim_node/degs
+        sim_nodes[i] = sim_node.mean()
+    return sim_nodes
+
+def localsim_euc_homophily(graph, features, ori_labels, train_idx=None):
+    graph = dgl.remove_self_loop(graph)
+    device = features.device
+    src_node, _ = graph.edges()
+    num_node, num_feat = features.shape[0], features.shape[1]
+    sim_nodes = torch.zeros(num_feat).to(device)
+
+    out = ops.u_sub_v(graph, features, features)
+    sim = -out
+    sim[sim.isnan()] = 0
+    print(f"calculate localsim_euc_homophily...")
+    for i in tqdm(range(num_feat)):
+        # degs = torch.bincount(src_node).float()
+        degs = graph.in_degrees().float()
+        degs[degs==0] = 1 # To prevent zero divide
+        sim_node = torch.zeros(num_node).to(device)
+        sim_node = sim_node.scatter_add_(0,src_node.long(), sim[:, i].squeeze(0))
+        sim_node = sim_node/degs
+        sim_nodes[i] = sim_node.mean()
+    return sim_nodes
+
+def class_controlled_feature_homophily(graph, features, ori_labels, train_idx=None):
+    assert(torch.logical_not(ori_labels.unique() >= 0).sum() == 0) # All the labels must start from 0
+    assert(len(ori_labels.unique()) == ori_labels.max() + 1)
+    graph = dgl.remove_self_loop(graph)
+    # graph = dgl.add_self_loop(graph)
+    if train_idx is not None:
+        labels = ori_labels[train_idx]
+        # use class info, so feature and graph be modified
+        features = features[train_idx]
+        graph = graph.subgraph(train_idx.int())
+
+    num_class = labels.unique().shape[0]
+    num_node, num_feat = features.shape[0], features.shape[1]
+    device = features.device
+    feature_cls = torch.zeros(num_class, num_feat).to(device)
+    labels = labels.long().to(device)
+    for c in range(num_class):
+        feature_cls[c] = features[labels==c].mean(dim=0)
+    cls_ctrl_feat = features - feature_cls[labels]
+
+    base_hom = (cls_ctrl_feat - cls_ctrl_feat.mean(dim=0).repeat(num_node,1))
+    base_hom = 2*base_hom*base_hom # -> [node_num, feat_dim]
+    # base_hom = base_hom.sum(dim=1) # -> [node_num, 1]
+    src_node, targ_node = graph.edges()
+    node_pair_distance = (cls_ctrl_feat[src_node]-cls_ctrl_feat[targ_node])*(cls_ctrl_feat[src_node]-cls_ctrl_feat[targ_node])
+    # node_pair_distance = node_pair_distance.sum(dim=1) # [edge_num, feat_dim] -> [edge_num, 1]
+    node_pair_CFH = base_hom[src_node] - node_pair_distance[src_node] # -> [edge_num, feat_dim]
+    node_level_CFH = torch.zeros(num_node, num_feat).to(device)
+    node_level_CFH = node_level_CFH.scatter_add_(0, src_node.long().unsqueeze(1).expand(-1, num_feat), node_pair_CFH)
+    return node_level_CFH.mean(dim=0)

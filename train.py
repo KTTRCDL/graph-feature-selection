@@ -2,7 +2,9 @@ import argparse
 from tqdm import tqdm
 
 import torch
-from torch.cuda.amp import autocast, GradScaler
+# from torch.cuda.amp import autocast, GradScaler
+# future pytorch version
+from torch.amp import autocast, GradScaler
 
 from model import Model
 from datasets import Dataset
@@ -25,7 +27,7 @@ def get_args():
     # feature selection
     parser.add_argument('--feature_norm_fn', type=str, default='z-norm', choices=['None', 'z-norm', 'torch-norm'], help='Feature normalization function')
     parser.add_argument('--node_selection_fn_name', type=str, default='mi_agg', help='Feature selection function name',
-                        choices=['None', 'mi_agg'])
+                        choices=['None', 'mi_agg', 'h_GE', 'h_attr', 'h_sim-cos', 'h_sim-euc', 'h_CTF'])
     parser.add_argument('--ratio', type=float, default=0.5, 
                         help='split ratio for feature selection, ratio feature will deliver to GNN, if raio=1.0, use GNN model')
     parser.add_argument('--node_selection_with_train_idx', action='store_true', default=True, help='use train_idx of split to select node features')
@@ -69,7 +71,9 @@ def get_args():
 def train_step(model, dataset: Dataset, optimizer, scheduler, scaler, amp=False):
     model.train()
 
-    with autocast(enabled=amp):
+    # with autocast(enabled=amp):
+    # future pytorch version
+    with autocast('cuda', enabled=amp):
         logits = model(graph=dataset.graph, x=dataset.node_features, x_1=dataset.node_features_1)
         loss = dataset.loss_fn(input=logits[dataset.train_idx], target=dataset.labels[dataset.train_idx])
 
@@ -84,7 +88,9 @@ def train_step(model, dataset: Dataset, optimizer, scheduler, scaler, amp=False)
 def evaluate(model, dataset, amp=False):
     model.eval()
 
-    with autocast(enabled=amp):
+    # with autocast(enabled=amp):
+    # future pytorch version
+    with autocast('cuda',enabled=amp):
         if not hasattr(dataset, 'node_features_1'):
             logits = model(graph=dataset.graph, x=dataset.node_features)
         else:

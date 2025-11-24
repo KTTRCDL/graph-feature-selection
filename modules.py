@@ -3,7 +3,7 @@ from torch import nn
 from dgl import ops
 from dgl.nn.functional import edge_softmax
 from dgl import function as fn
-from dgl.nn.pytorch.conv import APPNPConv, SGConv
+from dgl.nn.pytorch.conv import APPNPConv
 import math
 import torch.nn.functional as F
 

@@ -4,10 +4,16 @@ import torch
 from torch.nn import functional as F
 import dgl
 from sklearn.metrics import roc_auc_score
-from utils import z_norm, mi_agg
+from utils import z_norm, mi_agg, generalized_edge_homophily, attribute_homophily, localsim_cos_homophily, localsim_euc_homophily, class_controlled_feature_homophily
 
 SELECTION_FUNCTION = {
     'mi_agg': mi_agg,
+    'h_GE': generalized_edge_homophily,
+    'h_attr': attribute_homophily,
+    'h_sim-cos': localsim_cos_homophily,
+    'h_sim-euc': localsim_euc_homophily,
+    'h_CTF': class_controlled_feature_homophily,
+    'None': None
 }
 
 NORMALIZATION = {
