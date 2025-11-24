@@ -12,3 +12,4 @@ dependencies:
   - pytorch
   - dgl-cuda12.1
   - huggingface_hub
+  - matplotlib
